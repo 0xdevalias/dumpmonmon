@@ -1,0 +1,19 @@
+---
+:config:
+  :monitored:
+    :strings:
+      - "@gmail.com"
+      - "anonymous"
+      - "h4x0r"
+  # :regex:
+:twitter:
+  :monitored_users:
+    - "dumpmon"
+  :auth:
+    :consumer_key: "YOUR_TWITTER_CONSUMER_KEY"
+    :consumer_secret: "YOUR_TWITTER_CONSUMER_SECRET"
+    :secret: "YOUR_TWITTER_SECRET"
+    :token: "YOUR_TWITTER_TOKEN"
+  :max_tweet_count: 20
+:state:
+  :last_tweet_id: 358932421107908609
