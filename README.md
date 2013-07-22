@@ -2,6 +2,8 @@
 
 A ruby bot to monitor [DumpMon](https://twitter.com/dumpmon) (or anyone elses) posts on Twitter, and analyse the urls for interesting keywords.
 
+- Glenn / [/dev/alias](http://www.devalias.net/)
+
 ### Install
 
 1. Clone the repo `git clone https://github.com/alias1/dumpmonmon.git`
