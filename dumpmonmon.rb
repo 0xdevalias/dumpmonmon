@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 #
 # Dumpmon-mon v0.1 (2013-07-15)
 # By Glenn 'devalias' Grant (devalias.net)
