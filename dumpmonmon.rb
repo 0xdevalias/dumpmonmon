@@ -30,7 +30,7 @@ twitter_monitored_users = twitter_config[:monitored_users]
 state_config = config_file[:state]
 last_tweet_id = state_config[:last_tweet_id]
 
-puts last_tweet_id
+puts "Last tweet ID #{last_tweet_id}"
 
 # Configure Twitter gem
 Twitter.configure do |config|
@@ -105,51 +105,70 @@ results.each do |user|
   # For each tweet
   user[:tweets].each do |tweet|
     puts "    Tweet Id: #{tweet[:id]}" # TODO: Move this out of here?
+
     # For each url
-    url_matches = tweet[:urls].each.map do |url|
-      page = agent.get(url) # Load the page
+    begin
+      url_matches = tweet[:urls].each.map do |url|
+        page = agent.get(url) # Load the page
 
-      # For each monitored string
-      string_matches = monitored_strings.each.map do |check_string|
-        # puts "  String: #{check_string}"
+        # For each monitored string
+        string_matches = monitored_strings.each.map do |check_string|
+          # puts "  String: #{check_string}"
 
-        # For each match
-        matches = page.body.scan(check_string)
-        # matches = page.body.scan(check_string).map do |match|
-        #   # puts "      Match: #{match}"
-        #   # Return value
-        #   match = match
-        # end
+          # For each match
+          matches = page.body.scan(check_string)
+          # matches = page.body.scan(check_string).map do |match|
+          #   # puts "      Match: #{match}"
+          #   # Return value
+          #   match = match
+          # end
+
+          # Return value
+          check_string = {
+            :name => check_string,
+            :matches => matches
+          }
+        end # End for each monitored string
 
         # Return value
-        check_string = {
-          :name => check_string,
-          :matches => matches
+        url = {
+          :url => url,
+          :matches => string_matches
         }
-      end
+      end # For each url
 
-      # Return value
-      url = {
-        :url => url,
-        :matches => string_matches
-      }
-    end
-
-    # TODO: can probably seperate this display from the actual checking?
-    # For each found match
-    url_matches.each do |url_match|
-      puts "      URL: #{url_match[:url]}"
-      url_match[:matches].each do |string_match|
-        match_name = string_match[:name]
-        match_count = string_match[:matches].count
-        if match_count > 0
-          puts "        #{match_count} (#{match_name})"
+      # TODO: can probably seperate this display from the actual checking?
+      # For each found match
+      url_matches.each do |url_match|
+        puts "      URL: #{url_match[:url]})"
+        puts "        Matches:"
+        url_match[:matches].each do |string_match|
+          match_name = string_match[:name]
+          match_count = string_match[:matches].count
+          if match_count > 0
+            puts "        #{match_count} (#{match_name})"
+          end
         end
       end
-    end
 
-  end
-end
+    rescue Mechanize::ResponseCodeError => e
+      puts "      Error: #{e.response_code} received for #{e.page.uri}"
+    rescue Exception => e
+      # TODO: Generalise this for all exception handling?
+      STDERR.puts "----------------------------------------"
+      STDERR.puts " Exception"
+      STDERR.puts "----------------------------------------"
+      STDERR.puts e.message
+      STDERR.puts e.backtrace.inspect
+      STDERR.puts "----------------------------------------"
+      STDERR.puts "Please report this exception output in full at https://github.com/alias1/dumpmonmon/issues"
+      STDERR.puts "----------------------------------------"
+      abort("Quitting: Unhandled Exception Occured")
+    end # Error checking
+  end # For each tweet
+end # For each monitored user
+
+puts "Note: The last checked tweet ID was #{last_tweet_id}. For now, this will need to be manually updated in dumpmonmon.yml"
 
 # /response/raise_error.rb:21:in `on_complete': Error processing your OAuth request: Read-only application cannot POST (Twitter::Error::Unauthorized)
 # /response/raise_error.rb:21:in `on_complete': Status is a duplicate (Twitter::Error::Forbidden)
